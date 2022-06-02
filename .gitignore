@@ -1,0 +1,10 @@
+.DS_Store
+
+.vscode
+.idea
+.vs
+VehicleRestAPI/obj/*
+VehicleRestAPI/bin/*
+VehicleRestAPITest/obj/*
+VehicleRestAPITest/bin/*
+*.pdb
