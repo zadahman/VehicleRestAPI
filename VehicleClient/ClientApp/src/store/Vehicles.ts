@@ -61,14 +61,39 @@ interface ErrorOccurredAction {
 
 type Actions = GetAllVehiclesAction | CreateVehicleAction | GetOneVehicleAction | UpdateVehicleAction | DeleteVehicleAction | RequestVehicleAction | ErrorOccurredAction;
 
+function handleError(error: any, dispatch: any) {
+    dispatch({ type: 'ERROR_OCCURRED', error: true });
+    let errorMessage = error.title;
+
+    if (error.errors.Make !== undefined) {
+        errorMessage = errorMessage.concat( "\n", error.errors.Make[0]);
+    }
+
+    if (error.errors.Model !== undefined) {
+        errorMessage = errorMessage.concat( "\n", error.errors.Model[0]);
+    }
+
+    if (error.errors.Year !== undefined) {
+        errorMessage = errorMessage.concat( "\n", error.errors.Year[0]);
+    }
+
+    alert(errorMessage);
+}
+
 export const actionCreators = {
     requestVehicles: (startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
         const appState = getState();
         if (appState && appState.vehicles && startVehicleIndex !== appState.vehicles.startVehicleIndex) {
             fetch(`api/Vehicle`)
-                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(response => response.json())
                 .then(data => {
-                    dispatch({ type: 'GET_ALL_VEHICLES', startVehicleIndex: startVehicleIndex, vehicles: data });
+                    if (data.errors == null) {
+                        let newData  = data as Vehicles[];
+                        dispatch({ type: 'GET_ALL_VEHICLES', startVehicleIndex: startVehicleIndex, vehicles: newData });
+                    }
+                    else {
+                        handleError(data, dispatch);
+                    }
                 });
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
@@ -93,22 +118,7 @@ export const actionCreators = {
                         dispatch({type: 'CREATE_VEHICLE', startVehicleIndex: startVehicleIndex, vehicles: currentVehicles});
                     }
                     else {
-                        dispatch({ type: 'ERROR_OCCURRED', error: true });
-                        let errorMessage = data.title;
-                        
-                        if (data.errors.Make !== undefined) {
-                            errorMessage = errorMessage.concat( "\n", data.errors.Make[0]);
-                        }
-                        
-                        if (data.errors.Model !== undefined) {
-                            errorMessage = errorMessage.concat( "\n", data.errors.Model[0]);
-                        }
-                        
-                        if (data.errors.Year !== undefined) {
-                            errorMessage = errorMessage.concat( "\n", data.errors.Year[0]);
-                        }
-                        
-                        alert(errorMessage);
+                        handleError(data, dispatch);
                     }
                 })
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
@@ -118,13 +128,16 @@ export const actionCreators = {
         const appState = getState();
         if (appState && appState.vehicles) {
             fetch(`api/Vehicle/${id}`)
-                .then(response => response.json() as Promise<Vehicles>)
+                .then(response => response.json())
                 .then(data => {
-                    dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
-                    dispatch({ type: 'GET_ONE_VEHICLE', startVehicleIndex: startVehicleIndex, tempVehicle: data });
-                })
-                .catch((error) => {
-                    dispatch({ type: 'ERROR_OCCURRED', error: true });
+                    if (data.errors == null) {
+                        let newData  = data as Vehicles;
+                        dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
+                        dispatch({ type: 'GET_ONE_VEHICLE', startVehicleIndex: startVehicleIndex, tempVehicle: newData });
+                    }
+                    else {
+                        handleError(data, dispatch);
+                    }
                 });
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
@@ -146,28 +159,9 @@ export const actionCreators = {
                         dispatch({ type: 'UPDATE_VEHICLE', startVehicleIndex: startVehicleIndex, isUpdated: true, vehicles: newData });
                     }
                     else {
-                            dispatch({ type: 'ERROR_OCCURRED', error: true });
-                            let errorMessage = data.title;
-
-                            if (data.errors.Make !== undefined) {
-                                errorMessage = errorMessage.concat( "\n", data.errors.Make[0]);
-                            }
-
-                            if (data.errors.Model !== undefined) {
-                                errorMessage = errorMessage.concat( "\n", data.errors.Model[0]);
-                            }
-
-                            if (data.errors.Year !== undefined) {
-                                errorMessage = errorMessage.concat( "\n", data.errors.Year[0]);
-                            }
-
-                            alert(errorMessage);
+                        handleError(data, dispatch);
                     }
                 })
-                .catch((error) => {
-                    dispatch({ type: 'ERROR_OCCURRED', error: true });
-                });
-
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
     },
@@ -177,13 +171,16 @@ export const actionCreators = {
             fetch(`api/Vehicle/${id}`,{
                 method: 'DELETE',
             })
-                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(response => response.json())
                 .then(data => {
-                    dispatch({ type: 'DELETE_VEHICLE', startVehicleIndex: startVehicleIndex, isDeleted: true, vehicles: data });
+                    if (data.errors == null) {
+                        let newData  = data as Vehicles[];
+                        dispatch({ type: 'DELETE_VEHICLE', startVehicleIndex: startVehicleIndex, isDeleted: true, vehicles: newData });
+                    }
+                    else {
+                        handleError(data, dispatch);
+                    }
                 })
-                .catch((error) => {
-                    dispatch({ type: 'ERROR_OCCURRED', error: true });
-                });
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
     }
