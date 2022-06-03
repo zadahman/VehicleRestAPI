@@ -6,7 +6,7 @@ export interface VehiclesState {
     startVehicleIndex?: number;
     vehicles: Vehicles[];
     selectedVehicle: Vehicles;
-    error: object;
+    error: boolean;
 }
 
 export interface Vehicles {
@@ -56,7 +56,7 @@ interface RequestVehicleAction {
 
 interface ErrorOccurredAction {
     type: 'ERROR_OCCURRED';
-    error: object;
+    error: boolean;
 }
 
 type Actions = GetAllVehiclesAction | CreateVehicleAction | GetOneVehicleAction | UpdateVehicleAction | DeleteVehicleAction | RequestVehicleAction | ErrorOccurredAction;
@@ -85,23 +85,32 @@ export const actionCreators = {
                 },
                 body: JSON.stringify(newVehicle),
             })
-                .then(response => response.json() as Promise<Vehicles>)
+                .then(response => response.json())
                 .then(data => {
-                    currentVehicles.push(data);
-                    if (JSON.stringify(appState?.vehicles?.error) === '{}') {
-                        dispatch({
-                            type: 'CREATE_VEHICLE',
-                            startVehicleIndex: startVehicleIndex,
-                            vehicles: currentVehicles
-                        });
+                    if (data.errors == null) {
+                        let newData  = data as Vehicles;
+                        currentVehicles.push(newData);
+                        dispatch({type: 'CREATE_VEHICLE', startVehicleIndex: startVehicleIndex, vehicles: currentVehicles});
+                    }
+                    else {
+                        dispatch({ type: 'ERROR_OCCURRED', error: true });
+                        let errorMessage = data.title;
+                        
+                        if (data.errors.Make !== undefined) {
+                            errorMessage = errorMessage.concat( "\n", data.errors.Make[0]);
+                        }
+                        
+                        if (data.errors.Model !== undefined) {
+                            errorMessage = errorMessage.concat( "\n", data.errors.Model[0]);
+                        }
+                        
+                        if (data.errors.Year !== undefined) {
+                            errorMessage = errorMessage.concat( "\n", data.errors.Year[0]);
+                        }
+                        
+                        alert(errorMessage);
                     }
                 })
-                .catch(error => {
-                    console.log(error.title);
-                    dispatch({ type: 'ERROR_OCCURRED', error: error.errors });
-                    console.log("ok "+JSON.stringify(error));
-                    alert("test");
-                });
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
     },
@@ -115,7 +124,7 @@ export const actionCreators = {
                     dispatch({ type: 'GET_ONE_VEHICLE', startVehicleIndex: startVehicleIndex, tempVehicle: data });
                 })
                 .catch((error) => {
-                    dispatch({ type: 'ERROR_OCCURRED', error: error.errors });
+                    dispatch({ type: 'ERROR_OCCURRED', error: true });
                 });
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
@@ -130,12 +139,33 @@ export const actionCreators = {
                 },
                 body: JSON.stringify(newVehicle),
             })
-                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(response => response.json() )
                 .then(data => {
-                    dispatch({ type: 'UPDATE_VEHICLE', startVehicleIndex: startVehicleIndex, isUpdated: true, vehicles: data });
+                    if (data.errors == null) {
+                        let newData  = data as Vehicles[];
+                        dispatch({ type: 'UPDATE_VEHICLE', startVehicleIndex: startVehicleIndex, isUpdated: true, vehicles: newData });
+                    }
+                    else {
+                            dispatch({ type: 'ERROR_OCCURRED', error: true });
+                            let errorMessage = data.title;
+
+                            if (data.errors.Make !== undefined) {
+                                errorMessage = errorMessage.concat( "\n", data.errors.Make[0]);
+                            }
+
+                            if (data.errors.Model !== undefined) {
+                                errorMessage = errorMessage.concat( "\n", data.errors.Model[0]);
+                            }
+
+                            if (data.errors.Year !== undefined) {
+                                errorMessage = errorMessage.concat( "\n", data.errors.Year[0]);
+                            }
+
+                            alert(errorMessage);
+                    }
                 })
                 .catch((error) => {
-                    dispatch({ type: 'ERROR_OCCURRED', error: error.errors });
+                    dispatch({ type: 'ERROR_OCCURRED', error: true });
                 });
 
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
@@ -152,14 +182,14 @@ export const actionCreators = {
                     dispatch({ type: 'DELETE_VEHICLE', startVehicleIndex: startVehicleIndex, isDeleted: true, vehicles: data });
                 })
                 .catch((error) => {
-                    dispatch({ type: 'ERROR_OCCURRED', error: error.errors });
+                    dispatch({ type: 'ERROR_OCCURRED', error: true });
                 });
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
     }
 };
 
-const unloadedState: VehiclesState = {selectedVehicle: {} as Vehicles, vehicles: [], isLoading: false, error: {} };
+const unloadedState: VehiclesState = {selectedVehicle: {} as Vehicles, vehicles: [], isLoading: false, error: false };
 
 export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined, incomingAction: Action): VehiclesState => {
     if (state === undefined) {
@@ -174,7 +204,7 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
                 isLoading: true,
                 selectedVehicle: state.selectedVehicle,
                 startVehicleIndex: action.startVehicleIndex,
-                error: {}
+                error: state.error
             };
         case 'GET_ALL_VEHICLES':
         case 'CREATE_VEHICLE':
@@ -184,7 +214,7 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
                     vehicles: action.vehicles,
                     selectedVehicle: {} as Vehicles,
                     isLoading: false,
-                    error: {}
+                    error: state.error
                 };
             }
             break;
@@ -194,7 +224,7 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
                 vehicles: state.vehicles,
                 selectedVehicle: action.tempVehicle,
                 isLoading: false,
-                error: {}
+                error: state.error
             };
         case "UPDATE_VEHICLE":
             if (action.isUpdated) {
@@ -203,7 +233,7 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
                     selectedVehicle: {} as Vehicles,
                     startVehicleIndex: action.startVehicleIndex,
                     vehicles: action.vehicles,
-                    error: {}
+                    error: state.error
                 };
             }
             break;
@@ -214,7 +244,7 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
                     selectedVehicle: {} as Vehicles,
                     startVehicleIndex: action.startVehicleIndex,
                     vehicles: action.vehicles,
-                    error: {}
+                    error: state.error
                 };
             }
             break;

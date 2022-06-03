@@ -48,6 +48,7 @@ namespace VehicleClient.Controllers
         [HttpPut]
         public async Task<IActionResult> PutVehicle(Vehicle vehicle)
         {
+            if (!ModelState.IsValid) return BadRequest();
             try
             {
                 await _vehicleContext.Update(vehicle);

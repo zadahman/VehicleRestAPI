@@ -49,8 +49,8 @@ class FetchData extends React.PureComponent<VehicleProps> {
         
         <h1 id="tabelLabel">Vehicles</h1>
 
-        {(JSON.stringify(this.props.error) === '{}') ? this.renderVehiclesTable() : ''}
-        {(JSON.stringify(this.props.error) === '{}') ? this.renderPagination() : ''}
+        {this.renderVehiclesTable()}
+        {this.renderPagination()}
         
         <div>
           <Modal isOpen={this.state.modalOpen} toggle={this.toggle}>
