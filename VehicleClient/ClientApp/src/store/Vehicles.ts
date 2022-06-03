@@ -29,6 +29,24 @@ interface CreateVehicleAction {
     vehicles: Vehicles[];
 }
 
+interface CreateVehicleAction {
+    type: 'CREATE_VEHICLE';
+    startVehicleIndex: number;
+    vehicles: Vehicles[];
+}
+
+interface CreateVehicleAction {
+    type: 'CREATE_VEHICLE';
+    startVehicleIndex: number;
+    vehicles: Vehicles[];
+}
+
+interface CreateVehicleAction {
+    type: 'CREATE_VEHICLE';
+    startVehicleIndex: number;
+    vehicles: Vehicles[];
+}
+
 interface RequestVehicleAction {
     type: 'REQUEST_VEHICLES';
     startVehicleIndex: number;
@@ -51,6 +69,63 @@ export const actionCreators = {
         }
     },
     createVehicle: (newVehicle: object, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
+        // Only load data if it's something we don't already have (and are not already loading)
+        const appState = getState();
+        if (appState && appState.vehicles) {
+            fetch(`api/Vehicle`,{
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newVehicle),
+            })
+                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(data => {
+                    dispatch({ type: 'CREATE_VEHICLE', startVehicleIndex: startVehicleIndex, vehicles: data });
+                });
+
+            dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
+        }
+    },
+    getOneVehicle: (newVehicle: object, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
+        // Only load data if it's something we don't already have (and are not already loading)
+        const appState = getState();
+        if (appState && appState.vehicles) {
+            fetch(`api/Vehicle`,{
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newVehicle),
+            })
+                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(data => {
+                    dispatch({ type: 'CREATE_VEHICLE', startVehicleIndex: startVehicleIndex, vehicles: data });
+                });
+
+            dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
+        }
+    },
+    editVehicle: (newVehicle: object, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
+        // Only load data if it's something we don't already have (and are not already loading)
+        const appState = getState();
+        if (appState && appState.vehicles) {
+            fetch(`api/Vehicle`,{
+                method: 'POST', // or 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newVehicle),
+            })
+                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(data => {
+                    dispatch({ type: 'CREATE_VEHICLE', startVehicleIndex: startVehicleIndex, vehicles: data });
+                });
+
+            dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
+        }
+    },
+    deleteVehicle: (newVehicle: object, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
         const appState = getState();
         if (appState && appState.vehicles) {
@@ -96,17 +171,14 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
             }
         case 'CREATE_VEHICLE':
             if (action.startVehicleIndex === state.startVehicleIndex) {
-                console.log("data "+JSON.stringify(action.vehicles));
-                let newVehicles: Vehicles[] = state.vehicles;
-                console.log("newv "+JSON.stringify(newVehicles));
-                let test = action.vehicles;
-                newVehicles = ({...newVehicles, test:newVehicles });
+                var newList = [...state.vehicles];
+                var rcvdList = [action.vehicles];
+                // @ts-ignore
+                newList.push(...rcvdList);
                 
-                console.log("after "+JSON.stringify(newVehicles));
-
                 return {
                     startVehicleIndex: action.startVehicleIndex,
-                    vehicles: newVehicles,
+                    vehicles: newList,
                     isLoading: false
                 };
             }

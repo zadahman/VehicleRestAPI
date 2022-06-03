@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import {ApplicationState, AppThunkAction} from '../store';
-import * as WeatherForecastsStore from '../store/WeatherForecasts';
 import * as VehicleStore from '../store/Vehicles';
 import MyModal from './MyModal';
 
@@ -12,7 +12,6 @@ type VehicleProps =
     & typeof VehicleStore.actionCreators // ... plus action creators we've requested
     & RouteComponentProps<{ startVehicleIndex: string }>; // ... plus incoming routing parameters
 
-//class FetchData extends React.PureComponent<WeatherForecastProps> {
 class FetchData extends React.PureComponent<VehicleProps> {
   // This method is called when the component is first added to the document
   public componentDidMount() {
@@ -27,10 +26,8 @@ class FetchData extends React.PureComponent<VehicleProps> {
   public render() {
     return (
       <React.Fragment>
-        <h1 id="tabelLabel">Vehicles</h1>
-        <p>This component demonstrates fetching data from the server and working with URL parameters.</p>
-          
-        <MyModal {...this.props}/>
+        <h1 id="tabelLabel">Vehicles</h1>         
+        
         {this.renderForecastsTable()}
         {this.renderPagination()}
          
@@ -52,7 +49,7 @@ class FetchData extends React.PureComponent<VehicleProps> {
             <th>Make</th>
             <th>Model</th>
             <th>Year</th>
-            <th> </th>
+            <th> <MyModal {...this.props}/> </th>
           </tr>
         </thead>
         <tbody>
@@ -61,7 +58,12 @@ class FetchData extends React.PureComponent<VehicleProps> {
                 <td>{vehicle.make}</td>
                 <td>{vehicle.model}</td>
                 <td>{vehicle.year}</td>
-                <td> </td>
+                <td> <FaEdit
+                        onClick={() => {alert("testing");}}
+                     /> 
+                     <FaTrashAlt 
+                     /> 
+                </td>
               </tr>
           )}
         </tbody>
