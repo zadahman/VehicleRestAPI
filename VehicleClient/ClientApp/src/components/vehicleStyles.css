@@ -1,0 +1,14 @@
+#homeDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+#tableIcons {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    width: 50%;
+}

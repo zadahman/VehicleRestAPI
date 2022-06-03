@@ -60,7 +60,7 @@ namespace VehicleClient.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(await GetVehicles());
         }
 
         // POST: api/VehicleRestAPI
@@ -79,13 +79,9 @@ namespace VehicleClient.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteVehicle(int id)
         {
-            if (VehicleExists(id))
-            {
-                await _vehicleContext.Delete(id);
-                return Ok();
-            }
-
-            return NotFound();
+            if (!VehicleExists(id)) return NotFound();
+            await _vehicleContext.Delete(id);
+            return Ok(await GetVehicles());
         }
 
         private bool VehicleExists(int id)

@@ -39,12 +39,14 @@ interface UpdateVehicleAction {
     type: 'UPDATE_VEHICLE';
     startVehicleIndex: number;
     isUpdated: boolean;
+    vehicles: Vehicles[];
 }
 
 interface DeleteVehicleAction {
     type: 'DELETE_VEHICLE';
     startVehicleIndex: number;
     vehicles: Vehicles[];
+    isDeleted: boolean;
 }
 
 interface RequestVehicleAction {
@@ -61,7 +63,6 @@ type Actions = GetAllVehiclesAction | CreateVehicleAction | GetOneVehicleAction 
 
 export const actionCreators = {
     requestVehicles: (startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
-        // Only load data if it's something we don't already have (and are not already loading)
         const appState = getState();
         if (appState && appState.vehicles && startVehicleIndex !== appState.vehicles.startVehicleIndex) {
             fetch(`api/Vehicle`)
@@ -73,13 +74,12 @@ export const actionCreators = {
         }
     },
     createVehicle: (newVehicle: Vehicles, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
-        // Only load data if it's something we don't already have (and are not already loading)
         const appState = getState();
         if (appState && appState.vehicles) {
             const currentVehicles = appState.vehicles.vehicles;
             
             fetch(`api/Vehicle`,{
-                method: 'POST', // or 'PUT'
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -88,9 +88,8 @@ export const actionCreators = {
                 .then(response => response.json() as Promise<Vehicles>)
                 .then(data => {
                     newVehicle.id = data.id;
-                    console.log("ggg "+JSON.stringify(data));
                     currentVehicles.push(newVehicle);
-                    if (appState?.vehicles?.error == null) {
+                    if (JSON.stringify(appState?.vehicles?.error) === '{}') {
                         dispatch({
                             type: 'CREATE_VEHICLE',
                             startVehicleIndex: startVehicleIndex,
@@ -108,7 +107,6 @@ export const actionCreators = {
         }
     },
     getOneVehicle: (id: number, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
-        // Only load data if it's something we don't already have (and are not already loading)
         const appState = getState();
         if (appState && appState.vehicles) {
             fetch(`api/Vehicle/${id}`)
@@ -120,8 +118,7 @@ export const actionCreators = {
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
     },
-    updateVehicle: (newVehicle: object, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
-        // Only load data if it's something we don't already have (and are not already loading)
+    updateVehicle: (newVehicle: Vehicles, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
         const appState = getState();
         if (appState && appState.vehicles) {
             fetch(`api/Vehicle`,{
@@ -133,10 +130,10 @@ export const actionCreators = {
             })
                 .then(response => response.json() as Promise<Vehicles[]>)
                 .then(data => {
-                    dispatch({ type: 'UPDATE_VEHICLE', startVehicleIndex: startVehicleIndex, isUpdated: true });
+                    dispatch({ type: 'UPDATE_VEHICLE', startVehicleIndex: startVehicleIndex, isUpdated: true, vehicles: data });
                 })
                 .catch((error) => {
-                    dispatch({ type: 'UPDATE_VEHICLE', startVehicleIndex: startVehicleIndex, isUpdated: false });
+                    dispatch({ type: 'ERROR_OCCURRED', error: error.errors });
                 });
 
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
@@ -145,22 +142,16 @@ export const actionCreators = {
     deleteVehicle: (id: number, startVehicleIndex: number): AppThunkAction<Actions> => (dispatch, getState) => {
         const appState = getState();
         if (appState && appState.vehicles) {
-            const currentVehicles = appState.vehicles.vehicles;
-            const filteredVehicles = currentVehicles.filter(v => v.id !== id);
-
-            console.log("curr "+ JSON.stringify(currentVehicles));
-            console.log("filtered "+ JSON.stringify(filteredVehicles));
-            
             fetch(`api/Vehicle/${id}`,{
                 method: 'DELETE',
             })
-            .then(response => response)
-            .then(data => {
-                dispatch({ type: 'DELETE_VEHICLE', startVehicleIndex: startVehicleIndex, vehicles: filteredVehicles });
-            })
-            .catch((error) => {
-                dispatch({ type: 'DELETE_VEHICLE', startVehicleIndex: startVehicleIndex, vehicles: currentVehicles });
-            });
+                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(data => {
+                    dispatch({ type: 'DELETE_VEHICLE', startVehicleIndex: startVehicleIndex, isDeleted: true, vehicles: data });
+                })
+                .catch((error) => {
+                    dispatch({ type: 'ERROR_OCCURRED', error: error.errors });
+                });
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
     }
@@ -183,7 +174,6 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
                 error: {}
             };
         case 'GET_ALL_VEHICLES':
-        case 'DELETE_VEHICLE':
         case 'CREATE_VEHICLE':
             if (action.startVehicleIndex === state.startVehicleIndex) {
                 return {
@@ -197,9 +187,32 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
         case "GET_ONE_VEHICLE":
             break;
         case "UPDATE_VEHICLE":
+            if (action.isUpdated) {
+                return {
+                    isLoading: false,
+                    startVehicleIndex: action.startVehicleIndex,
+                    vehicles: action.vehicles,
+                    error: {}
+                };
+            }
+            break;
+        case 'DELETE_VEHICLE':
+            if (action.isDeleted) {
+                return {
+                    isLoading: false,
+                    startVehicleIndex: action.startVehicleIndex,
+                    vehicles: action.vehicles,
+                    error: {}
+                };
+            }
             break;
         case "ERROR_OCCURRED":
-            break;
+            return {
+                isLoading: false, 
+                startVehicleIndex: state.startVehicleIndex,
+                vehicles: state.vehicles,
+                error: action.error
+            };
     }
 
     return state;
