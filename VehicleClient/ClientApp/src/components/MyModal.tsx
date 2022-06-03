@@ -32,7 +32,7 @@ export default class MyModal extends React.PureComponent<VehicleProps, { isOpen:
             <div>
                 <Modal isOpen={this.state.isOpen} toggle={this.toggle}>
                     <ModalBody>
-                        <p>This is the content.</p>
+                        <h3>New Vehicle</h3>
                         <Form>
                             <FormGroup>
                                 <Label for="newMake">
@@ -65,7 +65,6 @@ export default class MyModal extends React.PureComponent<VehicleProps, { isOpen:
                                     onChange={(date) => this.setState({ newYear: date }) }
                                     showYearPicker
                                     dateFormat="yyyy"
-                                    yearItemNumber={9}
                                 />
                             </FormGroup>
                             <Button onClick={this.functionToExecute}>
@@ -96,6 +95,11 @@ export default class MyModal extends React.PureComponent<VehicleProps, { isOpen:
 
         const startVehicleIndex = parseInt(this.props.match.params.startVehicleIndex, 10) || 0;
         this.props.createVehicle(vehicles, startVehicleIndex);
-        this.toggle();
+        if (this.props.error == null) {
+            this.toggle();
+        }
+        else {
+           // let input = React.cloneElement(React.ReactElement);
+        }
     };
 }

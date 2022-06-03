@@ -15,21 +15,23 @@ type VehicleProps =
 class FetchData extends React.PureComponent<VehicleProps> {
   // This method is called when the component is first added to the document
   public componentDidMount() {
-    this.ensureDataFetched();
+    if (JSON.stringify(this.props.error) === '{}') this.ensureDataFetched();
   }
 
   // This method is called when the route parameters change
   public componentDidUpdate() {
-    this.ensureDataFetched();
+    if (JSON.stringify(this.props.error) === '{}') this.ensureDataFetched();
   }
   
   public render() {
+
+    
     return (
       <React.Fragment>
-        <h1 id="tabelLabel">Vehicles</h1>         
-        
-        {this.renderForecastsTable()}
-        {this.renderPagination()}
+        <h1 id="tabelLabel">Vehicles</h1>
+
+        {(JSON.stringify(this.props.error) === '{}') ? this.renderVehiclesTable() : ''}
+        {(JSON.stringify(this.props.error) === '{}') ? this.renderPagination() : ''}
          
           
       </React.Fragment>
@@ -41,7 +43,7 @@ class FetchData extends React.PureComponent<VehicleProps> {
     this.props.requestVehicles(startVehicleIndex);
   }
 
-  private renderForecastsTable() {
+  private renderVehiclesTable() {
     return (
       <table className='table table-striped' aria-labelledby="tabelLabel">
         <thead>
@@ -59,9 +61,12 @@ class FetchData extends React.PureComponent<VehicleProps> {
                 <td>{vehicle.model}</td>
                 <td>{vehicle.year}</td>
                 <td> <FaEdit
+                        id={`edit${vehicle.id.toString()}`}
                         onClick={() => {alert("testing");}}
                      /> 
-                     <FaTrashAlt 
+                     <FaTrashAlt
+                         id={`delete${vehicle.id.toString()}`}
+                         onClick={(e) => this.deleteVehicle(e, vehicle.id)}
                      /> 
                 </td>
               </tr>
@@ -83,6 +88,14 @@ class FetchData extends React.PureComponent<VehicleProps> {
       </div>
     );
   }
+
+  private deleteVehicle = (event: React.MouseEvent<SVGElement>, id: number) => {
+    event.preventDefault();
+
+    const startVehicleIndex = parseInt(this.props.match.params.startVehicleIndex, 10) || 0;
+    this.props.deleteVehicle(id, startVehicleIndex);
+  };
+
 }
 
 export default connect(

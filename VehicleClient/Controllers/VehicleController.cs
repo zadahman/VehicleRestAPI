@@ -69,9 +69,10 @@ namespace VehicleClient.Controllers
         [HttpPost]
         public async Task<ActionResult<Vehicle>> PostVehicle(Vehicle vehicle)
         {
+            if (!ModelState.IsValid) return BadRequest();
             var newVehicle = await _vehicleContext.Create(vehicle);
 
-            return CreatedAtAction(nameof(GetVehicle), new { id = vehicle.Id }, newVehicle);
+            return CreatedAtAction(nameof(GetVehicle), new {id = vehicle.Id}, newVehicle);
         }
 
         // DELETE: api/VehicleRestAPI/5

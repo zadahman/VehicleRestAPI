@@ -24,6 +24,16 @@ namespace VehicleClient
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy( 
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:5005",
+                            "http://localhost:5001").AllowAnyHeader().AllowAnyMethod();
+                    });
+            });
+            
             services.AddScoped<IVehicleRepository, VehicleRepository>();
             services.AddScoped<VehicleController>();
             services.AddDbContext<VehicleContext>(op => op.UseInMemoryDatabase("Vehiclelist"));
@@ -52,6 +62,9 @@ namespace VehicleClient
             app.UseSpaStaticFiles();
 
             app.UseRouting();
+            
+            app.UseCors();
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
