@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRestAPI", "VehicleRe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRestAPITest", "VehicleRestAPITest\VehicleRestAPITest.csproj", "{B649D1E5-B5E7-4719-8C17-711A719D65D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleAPIClient", "VehicleAPIClient\VehicleAPIClient.csproj", "{F6B5FEBC-48DF-498D-A63F-770C4C8DDEC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleClient", "VehicleClient\VehicleClient.csproj", "{B175B70A-512C-4DCC-B927-1F5278D7CF29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{B649D1E5-B5E7-4719-8C17-711A719D65D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B649D1E5-B5E7-4719-8C17-711A719D65D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B649D1E5-B5E7-4719-8C17-711A719D65D7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6B5FEBC-48DF-498D-A63F-770C4C8DDEC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6B5FEBC-48DF-498D-A63F-770C4C8DDEC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6B5FEBC-48DF-498D-A63F-770C4C8DDEC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6B5FEBC-48DF-498D-A63F-770C4C8DDEC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B175B70A-512C-4DCC-B927-1F5278D7CF29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B175B70A-512C-4DCC-B927-1F5278D7CF29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B175B70A-512C-4DCC-B927-1F5278D7CF29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B175B70A-512C-4DCC-B927-1F5278D7CF29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

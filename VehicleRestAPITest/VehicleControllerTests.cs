@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using VehicleRestAPI.Controllers;
-using VehicleRestAPI.Models;
-using VehicleRestAPI.Repositories;
+using VehicleClient.Controllers;
+using VehicleClient.Models;
+using VehicleClient.Repositories;
 
 namespace VehicleRestAPITest
 {

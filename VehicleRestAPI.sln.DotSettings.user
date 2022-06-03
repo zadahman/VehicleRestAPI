@@ -1,11 +1,8 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=03f19d33_002Dfc89_002D4597_002D99d4_002D4d05f43ad719/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EnsureUpdateVehicleYear #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;NUnit3x::B649D1E5-B5E7-4719-8C17-711A719D65D7::net5.0::VehicleRestAPITest.VehicleControllerTests.EnsureUpdateVehicleYear&lt;/TestId&gt;
-    &lt;TestId&gt;NUnit3x::B649D1E5-B5E7-4719-8C17-711A719D65D7::net5.0::VehicleRestAPITest.VehicleControllerTests.EnsureDeleteVehicle&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=03f19d33_002Dfc89_002D4597_002D99d4_002D4d05f43ad719/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EnsureUpdateVehicleYear #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;ProjectFile&gt;B649D1E5-B5E7-4719-8C17-711A719D65D7/f:VehicleControllerTests.cs&lt;/ProjectFile&gt;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1b6edf17_002D16e5_002D41fe_002Daddd_002D9b6dc250eb4e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="EnsureUpdateVehicleYear #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1b6edf17_002D16e5_002D41fe_002Daddd_002D9b6dc250eb4e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="EnsureUpdateVehicleYear #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::B649D1E5-B5E7-4719-8C17-711A719D65D7::net5.0::VehicleRestAPITest.VehicleControllerTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
@@ -31,4 +28,9 @@
   &lt;TestAncestor&gt;
     &lt;TestId&gt;NUnit3x::B649D1E5-B5E7-4719-8C17-711A719D65D7::net5.0::VehicleRestAPITest.VehicleControllerTests.EnsureUpdateVehicleYear&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+&lt;/SessionState&gt;</s:String>
+	
+	
+	
+	
+	</wpf:ResourceDictionary>

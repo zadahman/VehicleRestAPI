@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using VehicleRestAPI.Models;
+using VehicleClient.Models;
 
-namespace VehicleRestAPI.Repositories
+namespace VehicleClient.Repositories
 {
     public class VehicleRepository : IVehicleRepository
     {

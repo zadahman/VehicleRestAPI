@@ -3,8 +3,7 @@
 .vscode
 .idea
 .vs
-VehicleRestAPI/obj/*
+*/obj/*
 VehicleRestAPI/bin/*
-VehicleRestAPITest/obj/*
 VehicleRestAPITest/bin/*
 *.pdb

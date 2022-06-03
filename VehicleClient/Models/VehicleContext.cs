@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace VehicleRestAPI.Models
+namespace VehicleClient.Models
 {
     public class VehicleContext : DbContext
     {
