@@ -1,11 +1,11 @@
 import { Action, Reducer } from 'redux';
 import { AppThunkAction } from './';
-import {act} from "react-dom/test-utils";
 
 export interface VehiclesState {
     isLoading: boolean;
     startVehicleIndex?: number;
     vehicles: Vehicles[];
+    selectedVehicle: Vehicles;
     error: object;
 }
 
@@ -32,7 +32,7 @@ interface CreateVehicleAction {
 interface GetOneVehicleAction {
     type: 'GET_ONE_VEHICLE';
     startVehicleIndex: number;
-    tempVehicle: Vehicles[];
+    tempVehicle: Vehicles;
 }
 
 interface UpdateVehicleAction {
@@ -87,8 +87,7 @@ export const actionCreators = {
             })
                 .then(response => response.json() as Promise<Vehicles>)
                 .then(data => {
-                    newVehicle.id = data.id;
-                    currentVehicles.push(newVehicle);
+                    currentVehicles.push(data);
                     if (JSON.stringify(appState?.vehicles?.error) === '{}') {
                         dispatch({
                             type: 'CREATE_VEHICLE',
@@ -110,11 +109,14 @@ export const actionCreators = {
         const appState = getState();
         if (appState && appState.vehicles) {
             fetch(`api/Vehicle/${id}`)
-                .then(response => response.json() as Promise<Vehicles[]>)
+                .then(response => response.json() as Promise<Vehicles>)
                 .then(data => {
+                    dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
                     dispatch({ type: 'GET_ONE_VEHICLE', startVehicleIndex: startVehicleIndex, tempVehicle: data });
+                })
+                .catch((error) => {
+                    dispatch({ type: 'ERROR_OCCURRED', error: error.errors });
                 });
-
             dispatch({ type: 'REQUEST_VEHICLES', startVehicleIndex: startVehicleIndex });
         }
     },
@@ -157,7 +159,7 @@ export const actionCreators = {
     }
 };
 
-const unloadedState: VehiclesState = { vehicles: [], isLoading: false, error: {} };
+const unloadedState: VehiclesState = {selectedVehicle: {} as Vehicles, vehicles: [], isLoading: false, error: {} };
 
 export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined, incomingAction: Action): VehiclesState => {
     if (state === undefined) {
@@ -170,6 +172,7 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
             return {
                 vehicles: state.vehicles,
                 isLoading: true,
+                selectedVehicle: state.selectedVehicle,
                 startVehicleIndex: action.startVehicleIndex,
                 error: {}
             };
@@ -179,17 +182,25 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
                 return {
                     startVehicleIndex: action.startVehicleIndex,
                     vehicles: action.vehicles,
+                    selectedVehicle: {} as Vehicles,
                     isLoading: false,
                     error: {}
                 };
             }
             break;
         case "GET_ONE_VEHICLE":
-            break;
+            return {
+                startVehicleIndex: action.startVehicleIndex,
+                vehicles: state.vehicles,
+                selectedVehicle: action.tempVehicle,
+                isLoading: false,
+                error: {}
+            };
         case "UPDATE_VEHICLE":
             if (action.isUpdated) {
                 return {
                     isLoading: false,
+                    selectedVehicle: {} as Vehicles,
                     startVehicleIndex: action.startVehicleIndex,
                     vehicles: action.vehicles,
                     error: {}
@@ -200,6 +211,7 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
             if (action.isDeleted) {
                 return {
                     isLoading: false,
+                    selectedVehicle: {} as Vehicles,
                     startVehicleIndex: action.startVehicleIndex,
                     vehicles: action.vehicles,
                     error: {}
@@ -208,7 +220,8 @@ export const reducer: Reducer<VehiclesState> = (state: VehiclesState | undefined
             break;
         case "ERROR_OCCURRED":
             return {
-                isLoading: false, 
+                isLoading: false,
+                selectedVehicle: {} as Vehicles,
                 startVehicleIndex: state.startVehicleIndex,
                 vehicles: state.vehicles,
                 error: action.error

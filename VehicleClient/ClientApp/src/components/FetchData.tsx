@@ -7,7 +7,7 @@ import {ApplicationState} from '../store';
 import * as VehicleStore from '../store/Vehicles';
 import {Vehicles} from "../store/Vehicles";
 import './vehicleStyles.css';
-import {Button, Form, FormGroup, Input, Label, Modal, ModalBody} from "reactstrap";
+import {Button, Form, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, ModalFooter} from "reactstrap";
 import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -19,16 +19,19 @@ type VehicleProps =
 class FetchData extends React.PureComponent<VehicleProps> {
   // This method is called when the component is first added to the document
   public componentDidMount() {
-    if (JSON.stringify(this.props.error) === '{}') this.ensureDataFetched();
+    this.ensureDataFetched();
   }
 
   // This method is called when the route parameters change
   public componentDidUpdate() {
-    if (JSON.stringify(this.props.error) === '{}') this.ensureDataFetched();
+    this.ensureDataFetched();
+    
+    this.ensureView();
   }
   
   public state = {
     title: "",
+    view: false,
     modalOpen: false,
     vehicle: null,
     make: "",
@@ -36,6 +39,7 @@ class FetchData extends React.PureComponent<VehicleProps> {
     year: 0,
     id: 0,
     tempYear: null,
+    disableButton: false,
     execute: () => {}
   }
   
@@ -48,56 +52,64 @@ class FetchData extends React.PureComponent<VehicleProps> {
         {(JSON.stringify(this.props.error) === '{}') ? this.renderVehiclesTable() : ''}
         {(JSON.stringify(this.props.error) === '{}') ? this.renderPagination() : ''}
         
-        <Modal isOpen={this.state.modalOpen} toggle={this.toggle}>
-          <ModalBody>
-            <h3>{this.state.title}</h3>
-            <Form>
-              <FormGroup>
-                <Label for="newMake">
-                  Make
-                </Label>
-                <Input
-                    id="newMake"
-                    name="newMake"
-                    placeholder="Enter Vehicle Make"
-                    type="text"
-                    value={this.state.make}
-                    onChange={(event) => this.setState({ make: event.target.value }) }
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label for="newModel">
-                  Model
-                </Label>
-                <Input
-                    id="newModel"
-                    name="newModel"
-                    placeholder="Enter Vehicle Model"
-                    type="text"
-                    value={this.state.model}
-                    onChange={(event) => this.setState({ model: event.target.value  }) }
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label for="newYear">
-                  Year
-                </Label>
-                <DatePicker
-                    id="newYear"
-                    selected={this.state.tempYear}
-                    onChange={(date) => this.setState({ tempYear: date, year: date?.getFullYear() }) }
-                    showYearPicker
-                    dateFormat="yyyy"
-                    placeholderText="Click to Select a Date"
-                />
-              </FormGroup>
-              <Button onClick={this.state.execute}>
-                Submit
-              </Button>
-            </Form>
-          </ModalBody>
-        </Modal>
-        
+        <div>
+          <Modal isOpen={this.state.modalOpen} toggle={this.toggle}>
+            <ModalHeader>
+              {this.state.title}
+            </ModalHeader>
+            <ModalBody>
+              <Form>
+                <FormGroup>
+                  <Label for="newMake">
+                    Make
+                  </Label>
+                  <Input
+                      disabled={this.state.disableButton}
+                      id="newMake"
+                      name="newMake"
+                      placeholder="Enter Vehicle Make"
+                      type="text"
+                      value={this.state.make}
+                      onChange={(event) => this.setState({ make: event.target.value }) }
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Label for="newModel">
+                    Model
+                  </Label>
+                  <Input
+                      disabled={this.state.disableButton}
+                      id="newModel"
+                      name="newModel"
+                      placeholder="Enter Vehicle Model"
+                      type="text"
+                      value={this.state.model}
+                      onChange={(event) => this.setState({ model: event.target.value  }) }
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Label for="newYear">
+                    Year
+                  </Label>
+                  <DatePicker
+                      disabled={this.state.disableButton}
+                      id="newYear"
+                      selected={this.state.tempYear}
+                      onChange={(date) => this.setState({ tempYear: date, year: date?.getFullYear() }) }
+                      showYearPicker
+                      dateFormat="yyyy"
+                      placeholderText="Click to Select a Date"
+                  />
+                </FormGroup>
+                <ModalFooter>
+                  <Button disabled={this.state.disableButton} onClick={this.state.execute}>
+                    Submit
+                  </Button>
+                </ModalFooter>
+              </Form>
+            </ModalBody>
+          </Modal>
+        </div>
       </React.Fragment>
     );
   }
@@ -120,7 +132,7 @@ class FetchData extends React.PureComponent<VehicleProps> {
         </thead>
         <tbody>
           {this.props.vehicles.map((vehicle: VehicleStore.Vehicles) =>
-              <tr key={vehicle.id} >
+              <tr key={vehicle.id} onClick={(e) => this.viewVehicle(e, vehicle.id)}>
                 <td>{vehicle.make}</td>
                 <td>{vehicle.model}</td>
                 <td>{vehicle.year}</td>
@@ -140,7 +152,8 @@ class FetchData extends React.PureComponent<VehicleProps> {
 
   private toggle = () => {
     this.setState({
-      modalOpen: !this.state.modalOpen
+      modalOpen: !this.state.modalOpen,
+      disableButton: !this.state.view
     });
   }
 
@@ -157,8 +170,42 @@ class FetchData extends React.PureComponent<VehicleProps> {
     );
   }
 
+  private ensureView() {
+    if (this.state.modalOpen && this.state.view) {
+      let selectedVehicle = this.props.selectedVehicle;
+      if (selectedVehicle.id != null && selectedVehicle.id != this.state.id && this.state.disableButton) {
+        let tempYear = new Date();
+        tempYear.setFullYear(selectedVehicle.year);
+
+        this.setState({
+          title: `Viewing Vehicle ${selectedVehicle.id}`,
+          make: selectedVehicle.make,
+          model: selectedVehicle.model,
+          tempYear: tempYear,
+          view: false,
+          id: selectedVehicle.id
+        });
+      }
+    }
+  }
+  
+  private viewVehicle =  (event: React.MouseEvent<HTMLTableRowElement>, id: number) => {
+    event.preventDefault();
+
+    this.setState({
+      view: true
+    });
+    
+    this.toggle();
+    
+    const startVehicleIndex = parseInt(this.props.match.params.startVehicleIndex, 10) || 0;
+    this.props.getOneVehicle(id, startVehicleIndex);
+    this.forceUpdate();
+  };
+
   private deleteVehicle = (event: React.MouseEvent<SVGElement>, id: number) => {
     event.preventDefault();
+    event.stopPropagation();
 
     const startVehicleIndex = parseInt(this.props.match.params.startVehicleIndex, 10) || 0;
     this.props.deleteVehicle(id, startVehicleIndex);
@@ -166,6 +213,7 @@ class FetchData extends React.PureComponent<VehicleProps> {
 
   private processEditVehicle = (event: React.MouseEvent<SVGElement>, vehicle: Vehicles) => {
     event.preventDefault();
+    event.stopPropagation();
 
     this.toggle();
 
@@ -173,6 +221,8 @@ class FetchData extends React.PureComponent<VehicleProps> {
     tempYear.setFullYear(vehicle.year);
 
     this.setState({
+      disableButton: false,
+      title: `Editing Vehicle ${vehicle.id}`,
       id: vehicle.id,
       make: vehicle.make,
       model: vehicle.model,
@@ -188,6 +238,13 @@ class FetchData extends React.PureComponent<VehicleProps> {
     this.toggle();
 
     this.setState({
+      make: "",
+      model: "",
+      year: 0,
+      id: 0,
+      tempYear: null,
+      disableButton: false,
+      title: `Create New Vehicle`,
       execute: (e: React.MouseEvent<HTMLButtonElement>) => this.editCreateVehicle(e, "create")
     });
   }
